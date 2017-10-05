@@ -1,14 +1,43 @@
 package commands
 
 import (
-	"github.com/spf13/cobra"
+	"encoding/json"
 	"io/ioutil"
+
+	pb "github.com/sonm-io/core/proto"
+	"github.com/spf13/cobra"
+	"golang.org/x/net/context"
 )
 
-func searchBySlot(cmd *cobra.Command, slot []byte) error {
-	// todo:  parse file to pb.Slot
-	// todo: implement grpc call to market
-	cmd.Printf("FILE: \r\n%s", string(slot))
+func searchBySlot(cmd *cobra.Command, data []byte) error {
+	slot := &pb.Slot{}
+	err := json.Unmarshal(data, &slot)
+	if err != nil {
+		return err
+	}
+
+	cc, err := initGrpcClient()
+	if err != nil {
+		return err
+	}
+
+	result, err := cc.GetOrders(context.Background(), slot)
+	if err != nil {
+		return err
+	}
+
+	ordersCount := len(result.Orders)
+
+	if ordersCount == 0 {
+		cmd.Println("No orders found")
+		return nil
+	}
+
+	cmd.Printf("Found %d orders:\r\n", len(result.Orders))
+	for i, order := range result.Orders {
+		cmd.Printf("%d) %s\r\n", i, order.Id)
+	}
+
 	return nil
 }
 
