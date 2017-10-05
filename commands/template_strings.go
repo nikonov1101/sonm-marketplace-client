@@ -17,7 +17,7 @@ var slotTemplate = &pb.Slot{
 		RamBytes:      100 * 1024 * 1024,
 		GpuCount:      0,
 		Storage:       100,
-		NetTrafficIn:  0,
+		NetTrafficIn:  100,
 		NetTrafficOut: 100,
 		NetworkType:   pb.NetworkType_OUTBOUND,
 	},
