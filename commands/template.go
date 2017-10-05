@@ -12,7 +12,7 @@ var templateRootCmd = &cobra.Command{
 }
 
 var templateSlotCmd = &cobra.Command{
-	Use:   "slotTemplate",
+	Use:   "slot",
 	Short: "Generate slotTemplate template",
 	Run: func(cmd *cobra.Command, _ []string) {
 		cmd.Printf("%s\r\n", getSlotTemplate())
@@ -20,7 +20,7 @@ var templateSlotCmd = &cobra.Command{
 }
 
 var templateOrderCmd = &cobra.Command{
-	Use: "orderTemplate",
+	Use: "order",
 	Run: func(cmd *cobra.Command, _ []string) {
 		cmd.Printf("%s\r\n", getOrderTemplate())
 	},
