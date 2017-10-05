@@ -16,8 +16,6 @@ func sendOrderToMarket(cmd *cobra.Command, data []byte) error {
 		return err
 	}
 
-	cmd.Println("Sending order to market...")
-
 	cc, err := initGrpcClient()
 	if err != nil {
 		return err

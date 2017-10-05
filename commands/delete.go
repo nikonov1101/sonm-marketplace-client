@@ -1,12 +1,23 @@
 package commands
 
 import (
+	pb "github.com/sonm-io/core/proto"
 	"github.com/spf13/cobra"
+	"golang.org/x/net/context"
 )
 
 func deleteOrder(cmd *cobra.Command, id string) error {
-	// todo: implement grpc call to market
-	cmd.Printf("DELETE ORDER: %s\r\n", id)
+	cc, err := initGrpcClient()
+	if err != nil {
+		return err
+	}
+
+	_, err = cc.CancelOrder(context.Background(), &pb.Order{Id: id})
+	if err != nil {
+		return err
+	}
+
+	cmd.Println("Order deleted.")
 	return nil
 }
 
