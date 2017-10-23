@@ -5,8 +5,8 @@ import (
 	"os"
 
 	pb "github.com/sonm-io/core/proto"
+	"github.com/sonm-io/core/util"
 	"github.com/spf13/cobra"
-	"google.golang.org/grpc"
 )
 
 var (
@@ -15,14 +15,21 @@ var (
 	errOrderIDRequired   = errors.New("Order ID is required")
 
 	marketPlaceEndpt string
+	searchLimit      uint64
+	orderType        string
 )
 
 func Root() *cobra.Command {
 	rootCmd := &cobra.Command{Use: "market-client"}
+
+	searchOrderCmd.PersistentFlags().Uint64Var(&searchLimit, "limit", 15, "Order limit")
+	searchOrderCmd.PersistentFlags().StringVar(&orderType, "type", "ANY",
+		"Order type to search ANY, BID or ASK")
+
 	rootCmd.AddCommand(
 		templateRootCmd,
-		createOrderCmd,
 		searchOrderCmd,
+		createOrderCmd,
 		deleteOrderCmd,
 	)
 
@@ -38,7 +45,7 @@ func Root() *cobra.Command {
 }
 
 func initGrpcClient() (pb.MarketClient, error) {
-	conn, err := grpc.Dial(marketPlaceEndpt, grpc.WithInsecure())
+	conn, err := util.GetClientConn(marketPlaceEndpt)
 	if err != nil {
 		return nil, err
 	}
