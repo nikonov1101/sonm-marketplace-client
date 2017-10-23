@@ -6,22 +6,43 @@ import "insonmnia.proto";
 package sonm;
 
 service Hub {
-    rpc Ping(PingRequest) returns (PingReply) {}
-    rpc Status(HubStatusRequest) returns (HubStatusReply) {}
-    rpc List(ListRequest) returns (ListReply) {}
+    rpc Ping(Empty) returns (PingReply) {}
+    rpc Status(Empty) returns (HubStatusReply) {}
+    rpc List(Empty) returns (ListReply) {}
     rpc Info(HubInfoRequest) returns (InfoReply) {}
 
     rpc StartTask(HubStartTaskRequest) returns (HubStartTaskReply) {}
-    rpc StopTask(StopTaskRequest) returns (StopTaskReply) {}
+    rpc StopTask(ID) returns (Empty) {}
 
-    rpc TaskStatus(TaskStatusRequest) returns (TaskStatusReply) {}
-    rpc MinerStatus(HubStatusMapRequest) returns (StatusMapReply) {}
+    rpc TaskStatus(ID) returns (TaskStatusReply) {}
+    rpc MinerStatus(ID) returns (StatusMapReply) {}
     rpc TaskLogs(TaskLogsRequest) returns (stream TaskLogsChunk) {}
 
-    rpc ProposeDeal(DealRequest) returns (DealReply) {}
-}
+    rpc ProposeDeal(DealRequest) returns (Empty) {}
+    rpc DiscoverHub(DiscoverHubRequest) returns (Empty) {}
 
-message ListRequest {
+    // GetMinerProperties allows to obtain previously assigned resource
+    // properties for a given miner.
+    rpc GetMinerProperties(ID) returns (GetMinerPropertiesReply) {}
+
+    // SetMinerProperties method allows to specify additional resource
+    // properties for a miner specified by its ID.
+    // This may include GPU's capability to execute a well-known work such as
+    // Ethereum mining etc.
+    // Note, that this method overrides all previously specified properties.
+    rpc SetMinerProperties(SetMinerPropertiesRequest) returns (Empty) {}
+
+    // GetSlots allows to obtain previously assigned slots from for a given
+    // miner.
+    rpc GetSlots(ID) returns (GetSlotsReply) {}
+
+    // AddSlot allows to assign a new slot for a given miner.
+    // This method can fail if either there are no resources left on a miner
+    // or it has been previourly assigned for specified time duration.
+    rpc AddSlot(AddSlotRequest) returns (Empty) {}
+
+    // RemoveSlot removes the speified slot if fully matches.
+    rpc RemoveSlot(RemoveSlotRequest) returns (Empty) {}
 }
 
 message ListReply {
@@ -58,12 +79,6 @@ message HubStartTaskReply {
     repeated string endpoint = 2;
 }
 
-message HubStatusMapRequest {
-    string miner = 1;
-}
-
-message HubStatusRequest {}
-
 message HubStatusReply {
     uint64 minerCount = 1;
     uint64 uptime = 2;
@@ -76,5 +91,27 @@ message DealRequest {
     Order order = 1;
 }
 
-message DealReply {
+message GetMinerPropertiesReply {
+    map<string, string> properties = 1;
+}
+
+message SetMinerPropertiesRequest {
+    string ID = 1;
+    map<string, string> properties = 2;
+}
+
+message GetSlotsReply {
+    repeated Slot slot = 1;
+}
+
+message AddSlotRequest {
+    // Miner ID.
+    string ID = 1;
+    // Slot destription.
+    Slot slot = 2;
+}
+
+message RemoveSlotRequest {
+    string ID = 1;
+    Slot slot = 2;
 }
